@@ -1,6 +1,13 @@
-# pyproject.toml
-[project]
-name = "python-blog"
+[tool.poetry]
+name = "your-project"
 version = "0.1.0"
-description = "A Flask blog project"
-requires-python = "==3.11.8"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "3.11.8"
+flask = "^2.3.0"  # or your relevant packages
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
