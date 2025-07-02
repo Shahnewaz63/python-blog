@@ -13,8 +13,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 from flask_gravatar import Gravatar
 import os
+from smtplib import SMTP
 
 
+my_email = os.environ.get('EMAIL')
+passkey = os.environ.get('PASSKEY')
 '''
 Make sure the required packages are installed: 
 Open the Terminal in PyCharm (bottom left). 
@@ -33,6 +36,8 @@ app.config['SECRET_KEY'] = os.environ.get('FLASK-KEY')
 ckeditor = CKEditor(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+Bootstrap5(app)
 
 gravatar = Gravatar(app,
                     size=100,
@@ -57,8 +62,26 @@ def admin_only(function):
             abort(403)
     return wrapper_function
 
-Bootstrap5(app)
+def send_email(email, name):
+    text = """\
+Welcome to Our Blog!
 
+We're so glad you're here.
+
+Dive into our latest posts, explore fresh perspectives, and join a community of curious minds.
+Whether you're here to learn, get inspired, or just take a break, you're in the right place.
+
+Happy reading,
+Shahnewaz Hossain
+            """
+    with SMTP("smtp.gmail.com") as connection:
+            connection.starttls()
+            connection.login(user=my_email, password=passkey)
+            connection.sendmail(
+                from_addr=my_email,
+                to_addrs=email,
+                msg=f"Subject:Blog WEB Response\n\nHey {name},\n{text}"
+            )
 # TODO: Configure Flask-Login
 
 
@@ -112,10 +135,12 @@ with app.app_context():
 def register():
     user_form = RegisterForm()
     if user_form.validate_on_submit():
+        email=user_form.email.data
+        name=user_form.name.data
         new_user = User(
-            email=user_form.email.data,
+            email=email,
             password=generate_password_hash(user_form.password.data),
-            name=user_form.name.data
+            name=name
         )
         try:
             db.session.add(new_user)
@@ -124,6 +149,7 @@ def register():
             message = "You already have an account of that email. Login instead."
             return redirect(url_for('login', message=message))
         else:
+            send_email(email, name)
             login_user(new_user)
             return redirect(url_for("get_all_posts"))
     return render_template("register.html", form=user_form)
@@ -249,10 +275,17 @@ def about():
     return render_template("about.html")
 
 
-@app.route("/contact")
+@app.route("/contact", methods=['POST', 'GET'])
 def contact():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        message = request.form.get('message')
+        send_email(email, name)
+        return redirect(url_for('get_all_posts'))
     return render_template("contact.html")
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
