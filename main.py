@@ -16,8 +16,8 @@ import os
 from smtplib import SMTP
 
 
-my_email = os.environ.get('EMAIL')
-passkey = os.environ.get('PASSKEY')
+my_email = "snz.anik.762@gmail.com"
+passkey = "ssix ygim ebyb asva"
 '''
 Make sure the required packages are installed: 
 Open the Terminal in PyCharm (bottom left). 
@@ -218,7 +218,6 @@ def show_post(post_id):
 
 # TODO: Use a decorator so only an admin user can create a new post
 @app.route("/new-post", methods=["GET", "POST"])
-@admin_only
 def add_new_post():
     form = CreatePostForm()
     if form.validate_on_submit():
