@@ -16,8 +16,8 @@ import os
 from smtplib import SMTP
 
 
-my_email = "snz.anik.762@gmail.com"
-passkey = "ssix ygim ebyb asva"
+my_email = os.environ.get('EMAIL')
+passkey = os.environ.get('PASSKEY')
 '''
 Make sure the required packages are installed: 
 Open the Terminal in PyCharm (bottom left). 
