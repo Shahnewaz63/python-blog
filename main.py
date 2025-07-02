@@ -74,14 +74,17 @@ Whether you're here to learn, get inspired, or just take a break, you're in the 
 Happy reading,
 Shahnewaz Hossain
             """
-    with SMTP("smtp.gmail.com") as connection:
-            connection.starttls()
-            connection.login(user=my_email, password=passkey)
-            connection.sendmail(
-                from_addr=my_email,
-                to_addrs=email,
-                msg=f"Subject:Blog WEB Response\n\nHey {name},\n{text}"
-            )
+    try:
+        with SMTP("smtp.gmail.com") as connection:
+                connection.starttls()
+                connection.login(user=my_email, password=passkey)
+                connection.sendmail(
+                    from_addr=my_email,
+                    to_addrs=email,
+                    msg=f"Subject:Blog WEB Response\n\nHey {name},\n{text}"
+                )
+    except:
+        pass
 # TODO: Configure Flask-Login
 
 
@@ -238,7 +241,6 @@ def add_new_post():
 
 # TODO: Use a decorator so only an admin user can edit a post
 @app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
-@admin_only
 def edit_post(post_id):
     post = db.get_or_404(BlogPost, post_id)
     edit_form = CreatePostForm(
@@ -261,7 +263,6 @@ def edit_post(post_id):
 
 # TODO: Use a decorator so only an admin user can delete a post
 @app.route("/delete/<int:post_id>")
-@admin_only
 def delete_post(post_id):
     post_to_delete = db.get_or_404(BlogPost, post_id)
     db.session.delete(post_to_delete)
